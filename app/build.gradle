@@ -48,3 +48,15 @@ sceneform.asset('sampledata/models/Craft+Sofa.obj',
         'default',
         'sampledata/models/Craft+Sofa.sfa',
         'src/main/assets/Craft+Sofa')
+
+
+sceneform.asset('sampledata/models/table_wood.obj',
+        'default',
+        'sampledata/models/table_wood.sfa',
+        'src/main/assets/table_wood')
+
+sceneform.asset('sampledata/models/dinner_table.obj',
+        'default',
+        'sampledata/models/dinner_table.sfa',
+        'src/main/assets/dinner_table')
+

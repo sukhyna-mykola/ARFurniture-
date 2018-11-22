@@ -1,0 +1,43 @@
+{
+  materials: [
+    {
+      name: 'wire_087224198',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.3412,
+            0.87839999999999996,
+            0.77649999999999997,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.242536,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/models/table_wood.obj',
+    name: '3d-model',
+    recenter: 'root',
+    scale: 0.00094499999999999998,
+  },
+  version: '0.52:1',
+}

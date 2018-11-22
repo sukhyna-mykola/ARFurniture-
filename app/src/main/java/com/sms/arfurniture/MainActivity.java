@@ -1,27 +1,17 @@
 package com.sms.arfurniture;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuInflater;
 import android.view.PixelCopy;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -31,25 +21,15 @@ import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
-import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.Camera;
-import com.google.ar.sceneform.Node;
-import com.google.ar.sceneform.Sun;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.Texture;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.BaseTransformableNode;
-import com.google.ar.sceneform.ux.SelectionVisualizer;
-import com.google.ar.sceneform.ux.TransformableNode;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -72,10 +52,8 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         furnitureItems = new ArrayList<>();
         furnitureItems.add(new FurnitureItem(1, FurnitureItem.FurnitureType.CHAIR, "Chair", "Chair description", "file:///android_asset/chair_model.jpg", "chair_model.sfb"));
         furnitureItems.add(new FurnitureItem(2, FurnitureItem.FurnitureType.SOFA, "Sofa", "Sofa description", "file:///android_asset/Craft+Sofa.jpg", "Craft+Sofa.sfb"));
-        furnitureItems.add(new FurnitureItem(3, FurnitureItem.FurnitureType.CHAIR, "Chair", "Chair description", "file:///android_asset/chair_model.jpg", "chair_model.sfb"));
-        furnitureItems.add(new FurnitureItem(4, FurnitureItem.FurnitureType.SOFA, "Sofa", "Sofa description", "file:///android_asset/Craft+Sofa.jpg", "Craft+Sofa.sfb"));
-        furnitureItems.add(new FurnitureItem(5, FurnitureItem.FurnitureType.CHAIR, "Chair", "Chair description", "file:///android_asset/chair_model.jpg", "chair_model.sfb"));
-        furnitureItems.add(new FurnitureItem(6, FurnitureItem.FurnitureType.SOFA, "Sofa", "Sofa description", "file:///android_asset/Craft+Sofa.jpg", "Craft+Sofa.sfb"));
+        furnitureItems.add(new FurnitureItem(3, FurnitureItem.FurnitureType.TABLE, "Table", "Table description", "file:///android_asset/table_wood.jpg", "table_wood.sfb"));
+        furnitureItems.add(new FurnitureItem(4, FurnitureItem.FurnitureType.TABLE, "Dinner Table", "Dinner Table description", "file:///android_asset/dinner-table-vikor-3d-model-max-obj-3ds-fbx-stl-dae.jpg", "dinner_table.sfb"));
 
     }
 
@@ -390,10 +368,6 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         for (FurnitureNode n : nodes) {
             n.hideControll();
         }
-
-        // hide plane texture
-        fragment.getArSceneView()
-                .getPlaneRenderer().setEnabled(false);
     }
 
     private void update() {
