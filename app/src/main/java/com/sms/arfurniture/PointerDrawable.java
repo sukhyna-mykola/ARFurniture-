@@ -12,7 +12,7 @@ import android.support.annotation.Nullable;
 public class PointerDrawable extends Drawable {
 
     private final Paint paint = new Paint();
-    private boolean enabled;
+    private boolean enabled, visible;
 
     public boolean isEnabled() {
         return enabled;
@@ -22,16 +22,22 @@ public class PointerDrawable extends Drawable {
         this.enabled = enabled;
     }
 
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
     @Override
     public void draw(@NonNull Canvas canvas) {
         float cx = canvas.getWidth() / 2;
         float cy = canvas.getHeight() / 2;
-        if (enabled) {
-            paint.setColor(Color.GREEN);
-            canvas.drawCircle(cx, cy, 10, paint);
-        } else {
-            paint.setColor(Color.GRAY);
-            canvas.drawText("X", cx, cy, paint);
+        if (visible) {
+            if (enabled) {
+                paint.setColor(Color.GREEN);
+                canvas.drawCircle(cx, cy, 7, paint);
+            } else {
+                paint.setColor(Color.GRAY);
+                canvas.drawText("X", cx, cy, paint);
+            }
         }
     }
 

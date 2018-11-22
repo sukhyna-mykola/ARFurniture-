@@ -13,7 +13,7 @@ import com.google.ar.sceneform.ux.TransformationSystem;
 public class MyArFragment extends ArFragment {
 
 
-    @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
+  /*  @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
     protected TransformationSystem makeTransformationSystem() {
         MyFootprintSelectionVisualizer selectionVisualizer = new MyFootprintSelectionVisualizer();
 
@@ -42,7 +42,7 @@ public class MyArFragment extends ArFragment {
                         });
 
         return transformationSystem;
-    }
+    }*/
 
     @Override
     public String[] getAdditionalPermissions() {

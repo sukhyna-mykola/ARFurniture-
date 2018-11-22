@@ -2,6 +2,7 @@ package com.sms.arfurniture;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,10 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuInflater;
 import android.view.PixelCopy;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
@@ -27,6 +31,7 @@ import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
+import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.Camera;
@@ -48,6 +53,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -55,7 +61,12 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
     private ArFragment fragment;
 
     private RecyclerView furnitureList;
-    private static List<FurnitureItem> furnitureItems;
+    public static List<FurnitureItem> furnitureItems;
+
+    private List<FurnitureNode> nodes;
+
+    private boolean hideControll, hideGrid, hidePointer;
+
 
     static {
         furnitureItems = new ArrayList<>();
@@ -68,6 +79,16 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
     }
 
+
+    public static FurnitureItem getFurnitireItemById(long id) {
+        for (FurnitureItem item : furnitureItems) {
+            if (item.getId() == id)
+                return item;
+        }
+
+        return null;
+    }
+
     private PointerDrawable pointer = new PointerDrawable();
     private boolean isTracking;
     private boolean isHitting;
@@ -77,14 +98,57 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+      /*  Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 takePhoto();
             }
         });
+
+        findViewById(R.id.action_hide_controll).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideControll = !hideControll;
+
+                if (hideControll) {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_visibility_off_black_24dp);
+                } else {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_visibility_black_24dp);
+                }
+            }
+        });
+
+        findViewById(R.id.action_hide_grid).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideGrid = !hideGrid;
+
+                if (hideGrid) {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_border_clear_black_24dp);
+                } else {
+                    ((ImageButton) v).setImageResource(R.drawable.grid_24dp);
+                }
+            }
+        });
+
+        findViewById(R.id.action_hide_pointer).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hidePointer = !hidePointer;
+
+                if (hidePointer) {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp);
+                } else {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_wb_sunny_black_24dp);
+                }
+            }
+        });
+
+
+        nodes = new ArrayList<>();
 
         furnitureList = findViewById(R.id.furniture_list_view);
         furnitureList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -94,17 +158,29 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
             fragment.onUpdate(frameTime);
             onUpdate();
+
         });
 
 
-        findViewById(R.id.removeSelected).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removeSelected();
-            }
-        });
         setupPlainTexture();
     }
+
+/*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_hide:
+
+                return true;
+        }
+        return false;
+    }*/
 
     private void setupPlainTexture() {
         // Build texture sampler
@@ -128,6 +204,8 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
     }
 
     private void onUpdate() {
+
+
         boolean trackingChanged = updateTracking();
         View contentView = findViewById(android.R.id.content);
         if (trackingChanged) {
@@ -146,6 +224,29 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                 contentView.invalidate();
             }
         }
+
+        if (hidePointer) {
+            pointer.setVisible(false);
+        } else {
+            pointer.setVisible(true);
+        }
+        contentView.invalidate();
+
+        if (hideControll) {
+            hide();
+        } else {
+            update();
+        }
+
+        if (hideGrid) {
+            fragment.getArSceneView()
+                    .getPlaneRenderer().setEnabled(false);
+        } else {
+            fragment.getArSceneView()
+                    .getPlaneRenderer().setEnabled(true);
+        }
+
+
     }
 
     private boolean updateTracking() {
@@ -183,10 +284,10 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
     @Override
     public void OnItemClick(FurnitureItem item) {
-        addObject(Uri.parse(item.getModel()));
+        addObject(item);
     }
 
-    private void addObject(Uri model) {
+    private void addObject(FurnitureItem item) {
         Frame frame = fragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
         List<HitResult> hits;
@@ -196,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                 Trackable trackable = hit.getTrackable();
                 if (trackable instanceof Plane &&
                         ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    placeObject(fragment, hit.createAnchor(), model);
+                    placeObject(fragment, hit.createAnchor(), item);
                     break;
 
                 }
@@ -204,12 +305,12 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         }
     }
 
-    private void placeObject(ArFragment fragment, Anchor anchor, Uri model) {
+    private void placeObject(ArFragment fragment, Anchor anchor, FurnitureItem item) {
         CompletableFuture<Void> renderableFuture =
                 ModelRenderable.builder()
-                        .setSource(fragment.getContext(), model)
+                        .setSource(fragment.getContext(), Uri.parse(item.getModel()))
                         .build()
-                        .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable))
+                        .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable, item.getId()))
                         .exceptionally((throwable -> {
                             AlertDialog.Builder builder = new AlertDialog.Builder(this);
                             builder.setMessage(throwable.getMessage())
@@ -220,16 +321,14 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                         }));
     }
 
-    private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable) {
+    private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable, long itemId) {
         AnchorNode anchorNode = new AnchorNode(anchor);
-        TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
+        FurnitureNode node = new FurnitureNode(fragment.getTransformationSystem(), itemId, this);
         node.setRenderable(renderable);
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
-
-        node.onDeactivate();
-
+        nodes.add(node);
     }
 
     private String generateFilename() {
@@ -241,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
 
     private void takePhoto() {
+
         final String filename = generateFilename();
         ArSceneView view = fragment.getArSceneView();
 
@@ -260,23 +360,48 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                 toast.show();
             }
             handlerThread.quitSafely();
+
         }, new Handler(handlerThread.getLooper()));
     }
 
 
     public void removeSelected() {
-        List<Node> children = fragment.getArSceneView().getScene().getChildren();
-
-        for (Node anchorNode : children) {
-            if (anchorNode instanceof AnchorNode)
-                for (Node node : anchorNode.getChildren())
-                    if (node instanceof TransformableNode) {
-                        if (((TransformableNode) node).isSelected()) {
-                            ((AnchorNode) anchorNode).getAnchor().detach();
-                            node.setParent(null);
-                            node.setRenderable(null);
-                        }
-                    }
+        boolean removed = false;
+        Iterator<FurnitureNode> iterator = nodes.iterator();
+        while (iterator.hasNext()) {
+            FurnitureNode n = iterator.next();
+            if (n.isSelected()) {
+                n.getParentNode().getAnchor().detach();
+                n.setParent(null);
+                n.setRenderable(null);
+                iterator.remove();
+                removed = true;
+            }
+        }
+        if (removed) {
+            if (!nodes.isEmpty()) {
+                nodes.get(nodes.size() - 1).select();
+            }
         }
     }
+
+
+    public void hide() {
+        for (FurnitureNode n : nodes) {
+            n.hideControll();
+        }
+
+        // hide plane texture
+        fragment.getArSceneView()
+                .getPlaneRenderer().setEnabled(false);
+    }
+
+    private void update() {
+        for (FurnitureNode n : nodes) {
+            n.updateNode();
+        }
+
+    }
+
+
 }

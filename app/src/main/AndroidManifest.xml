@@ -30,7 +30,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.ar.sms.provider"
+            android:authorities="${applicationId}.ar.sm.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

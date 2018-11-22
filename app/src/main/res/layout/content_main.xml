@@ -8,18 +8,40 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
+
     <fragment
         android:id="@+id/sceneform_fragment"
         android:name="com.sms.arfurniture.MyArFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/removeSelected"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="remove" />
+        android:background="@color/colorTransparent">
+
+        <ImageButton
+            android:id="@+id/action_hide_controll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_visibility_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/action_hide_grid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:src="@drawable/grid_24dp" />
+
+        <ImageButton
+            android:id="@+id/action_hide_pointer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_wb_sunny_black_24dp" />
+
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/furniture_list_view"
