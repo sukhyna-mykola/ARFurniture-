@@ -37,35 +37,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class MainActivity extends AppCompatActivity implements FurnitureListAdapter.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements FurnitureListAdapter.OnItemClickListener, RemoweSelectedNodeListener, View.OnClickListener {
     private ArFragment fragment;
 
     private RecyclerView furnitureList;
-    public static List<FurnitureItem> furnitureItems;
 
-    private List<FurnitureNode> nodes;
+    private FurnitureItemHelper furnitureItemHelper;
+    private NodesHelper nodesHelper;
 
     private boolean hideControll, hideGrid, hidePointer;
-
-
-    static {
-        furnitureItems = new ArrayList<>();
-        furnitureItems.add(new FurnitureItem(1, FurnitureItem.FurnitureType.CHAIR, "Chair", "Chair description", "file:///android_asset/chair_model.jpg", "chair_model.sfb"));
-        furnitureItems.add(new FurnitureItem(2, FurnitureItem.FurnitureType.SOFA, "Sofa", "Sofa description", "file:///android_asset/Craft+Sofa.jpg", "Craft+Sofa.sfb"));
-        furnitureItems.add(new FurnitureItem(3, FurnitureItem.FurnitureType.TABLE, "Table", "Table description", "file:///android_asset/table_wood.jpg", "table_wood.sfb"));
-        furnitureItems.add(new FurnitureItem(4, FurnitureItem.FurnitureType.TABLE, "Dinner Table", "Dinner Table description", "file:///android_asset/dinner-table-vikor-3d-model-max-obj-3ds-fbx-stl-dae.jpg", "dinner_table.sfb"));
-
-    }
-
-
-    public static FurnitureItem getFurnitireItemById(long id) {
-        for (FurnitureItem item : furnitureItems) {
-            if (item.getId() == id)
-                return item;
-        }
-
-        return null;
-    }
 
     private PointerDrawable pointer = new PointerDrawable();
     private boolean isTracking;
@@ -76,61 +56,12 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-      /*  Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
-
-        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                takePhoto();
-            }
-        });
-
-        findViewById(R.id.action_hide_controll).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideControll = !hideControll;
-
-                if (hideControll) {
-                    ((ImageButton) v).setImageResource(R.drawable.ic_visibility_off_black_24dp);
-                } else {
-                    ((ImageButton) v).setImageResource(R.drawable.ic_visibility_black_24dp);
-                }
-            }
-        });
-
-        findViewById(R.id.action_hide_grid).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideGrid = !hideGrid;
-
-                if (hideGrid) {
-                    ((ImageButton) v).setImageResource(R.drawable.ic_border_clear_black_24dp);
-                } else {
-                    ((ImageButton) v).setImageResource(R.drawable.grid_24dp);
-                }
-            }
-        });
-
-        findViewById(R.id.action_hide_pointer).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hidePointer = !hidePointer;
-
-                if (hidePointer) {
-                    ((ImageButton) v).setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp);
-                } else {
-                    ((ImageButton) v).setImageResource(R.drawable.ic_wb_sunny_black_24dp);
-                }
-            }
-        });
-
-
-        nodes = new ArrayList<>();
+        furnitureItemHelper = FurnitureItemHelper.getInstance();
+        nodesHelper = NodesHelper.getInstance();
 
         furnitureList = findViewById(R.id.furniture_list_view);
         furnitureList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        furnitureList.setAdapter(new FurnitureListAdapter(this, furnitureItems));
+        furnitureList.setAdapter(new FurnitureListAdapter(this, furnitureItemHelper.getFurnitureItems()));
 
         fragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
@@ -141,45 +72,13 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
 
         setupPlainTexture();
+
+        findViewById(R.id.action_hide_controll).setOnClickListener(this);
+        findViewById(R.id.action_hide_grid).setOnClickListener(this);
+        findViewById(R.id.action_hide_pointer).setOnClickListener(this);
+        findViewById(R.id.action_take_photo).setOnClickListener(this);
     }
 
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        new MenuInflater(this).inflate(R.menu.menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_hide:
-
-                return true;
-        }
-        return false;
-    }*/
-
-    private void setupPlainTexture() {
-        // Build texture sampler
-        Texture.Sampler sampler = Texture.Sampler.builder()
-                .setMinFilter(Texture.Sampler.MinFilter.LINEAR)
-                .setMagFilter(Texture.Sampler.MagFilter.LINEAR)
-                .setWrapMode(Texture.Sampler.WrapMode.REPEAT).build();
-
-        // Build texture with sampler
-        CompletableFuture<Texture> trigrid = Texture.builder()
-                .setSource(this, R.drawable.plain)
-                .setSampler(sampler).build();
-
-        // Set plane texture
-        fragment.getArSceneView()
-                .getPlaneRenderer()
-                .getMaterial()
-                .thenAcceptBoth(trigrid, (material, texture) -> {
-                    material.setTexture(PlaneRenderer.MATERIAL_TEXTURE, texture);
-                });
-    }
 
     private void onUpdate() {
 
@@ -211,9 +110,9 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         contentView.invalidate();
 
         if (hideControll) {
-            hide();
+            nodesHelper.hideNodesControll();
         } else {
-            update();
+            nodesHelper.update();
         }
 
         if (hideGrid) {
@@ -260,11 +159,6 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         return new android.graphics.Point(vw.getWidth() / 2, vw.getHeight() / 2);
     }
 
-    @Override
-    public void OnItemClick(FurnitureItem item) {
-        addObject(item);
-    }
-
     private void addObject(FurnitureItem item) {
         Frame frame = fragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
@@ -301,25 +195,19 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
     private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable, long itemId) {
         AnchorNode anchorNode = new AnchorNode(anchor);
-        FurnitureNode node = new FurnitureNode(fragment.getTransformationSystem(), itemId, this);
+        FurnitureNode node = new FurnitureNode(fragment.getTransformationSystem(), itemId, this, this);
         node.setRenderable(renderable);
         node.setParent(anchorNode);
+        //node.addControllNode();
+
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
-        nodes.add(node);
-    }
 
-    private String generateFilename() {
-        String date =
-                new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault()).format(new Date());
-        return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
+        nodesHelper.add(node);
     }
 
 
     private void takePhoto() {
-
-        final String filename = generateFilename();
         ArSceneView view = fragment.getArSceneView();
 
         // Create a bitmap the size of the scene view.
@@ -331,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         // Make the request to copy.
         PixelCopy.request(view, bitmap, (copyResult) -> {
             if (copyResult == PixelCopy.SUCCESS) {
-                PhotoFragment.newInstance(bitmap, filename).show(getSupportFragmentManager(), "photo_fragment");
+                PhotoFragment.newInstance(bitmap).show(getSupportFragmentManager(), "photo_fragment");
             } else {
                 Toast toast = Toast.makeText(MainActivity.this,
                         "Failed to copyPixels: " + copyResult, Toast.LENGTH_LONG);
@@ -342,40 +230,72 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         }, new Handler(handlerThread.getLooper()));
     }
 
+    private void setupPlainTexture() {
+        // Build texture sampler
+        Texture.Sampler sampler = Texture.Sampler.builder()
+                .setMinFilter(Texture.Sampler.MinFilter.LINEAR)
+                .setMagFilter(Texture.Sampler.MagFilter.LINEAR)
+                .setWrapMode(Texture.Sampler.WrapMode.REPEAT).build();
 
-    public void removeSelected() {
-        boolean removed = false;
-        Iterator<FurnitureNode> iterator = nodes.iterator();
-        while (iterator.hasNext()) {
-            FurnitureNode n = iterator.next();
-            if (n.isSelected()) {
-                n.getParentNode().getAnchor().detach();
-                n.setParent(null);
-                n.setRenderable(null);
-                iterator.remove();
-                removed = true;
-            }
-        }
-        if (removed) {
-            if (!nodes.isEmpty()) {
-                nodes.get(nodes.size() - 1).select();
-            }
-        }
+        // Build texture with sampler
+        CompletableFuture<Texture> trigrid = Texture.builder()
+                .setSource(this, R.drawable.plain)
+                .setSampler(sampler).build();
+
+        // Set plane texture
+        fragment.getArSceneView()
+                .getPlaneRenderer()
+                .getMaterial()
+                .thenAcceptBoth(trigrid, (material, texture) -> {
+                    material.setTexture(PlaneRenderer.MATERIAL_TEXTURE, texture);
+                });
+    }
+
+    @Override
+    public void OnItemClick(FurnitureItem item) {
+        addObject(item);
     }
 
 
-    public void hide() {
-        for (FurnitureNode n : nodes) {
-            n.hideControll();
-        }
+    @Override
+    public void onRemove() {
+        nodesHelper.removeSelectedNode();
     }
 
-    private void update() {
-        for (FurnitureNode n : nodes) {
-            n.updateNode();
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.action_hide_controll:
+                hideControll = !hideControll;
+
+                if (hideControll) {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_visibility_off_black_24dp);
+                } else {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_visibility_black_24dp);
+                }
+                break;
+            case R.id.action_hide_grid:
+                hideGrid = !hideGrid;
+
+                if (hideGrid) {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_border_clear_black_24dp);
+                } else {
+                    ((ImageButton) v).setImageResource(R.drawable.grid_24dp);
+                }
+                break;
+
+            case R.id.action_hide_pointer:
+                hidePointer = !hidePointer;
+
+                if (hidePointer) {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp);
+                } else {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_radio_button_checked_black_24dp);
+                }
+                break;
+            case R.id.action_take_photo:
+                takePhoto();
+                break;
         }
-
     }
-
-
 }

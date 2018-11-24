@@ -25,24 +25,29 @@ import com.squareup.picasso.Picasso;
 public class FurnitureNode extends TransformableNode {
     public static final String TAG = FurnitureNode.class.getClass().getSimpleName();
 
+    private RemoweSelectedNodeListener removeSelected;
+
+    private TransformableNode controllNode;
+
     public AnchorNode getParentNode() {
         return (AnchorNode) getParent();
     }
 
-    public FurnitureNode(TransformationSystem transformationSystem, long itemId, Context context) {
+    public FurnitureNode(TransformationSystem transformationSystem, long itemId, Context context, RemoweSelectedNodeListener remoweSelectedNodeListener) {
         super(transformationSystem);
+        this.removeSelected = remoweSelectedNodeListener;
 
-        FurnitureItem item = MainActivity.getFurnitireItemById(itemId);
+        FurnitureItem item = FurnitureItemHelper.getInstance().getFurnitireItemById(itemId);
 
-        TransformableNode node = new TransformableNode(transformationSystem);
-        node.setLocalPosition(new Vector3(0f, 1f, 0f));
+        controllNode = new TransformableNode(transformationSystem);
+        controllNode.setLocalPosition(new Vector3(0f, 1f, 0f));
 
         ViewRenderable.builder()
                 .setView(context, R.layout.controll_renderable)
                 .build()
                 .thenAccept(
                         renderable -> {
-                            node.setRenderable(renderable);
+                            controllNode.setRenderable(renderable);
                             View controllView = renderable.getView();
 
                             TextView title = controllView.findViewById(R.id.title);
@@ -57,7 +62,7 @@ public class FurnitureNode extends TransformableNode {
                             controllView.findViewById(R.id.removeSelected).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    ((MainActivity) context).removeSelected();
+                                    removeSelected.onRemove();
                                 }
                             });
 
@@ -69,15 +74,85 @@ public class FurnitureNode extends TransformableNode {
                                 }
                             });
 
-                            SeekBar rotation = controllView.findViewById(R.id.rotationSeek);
-                            rotation.setMax(360);
-                            rotation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            SeekBar rotationXY = controllView.findViewById(R.id.rotationXYSeek);
+                            //SeekBar rotationXZ = controllView.findViewById(R.id.rotationXZSeek);
+                            // SeekBar rotationYZ = controllView.findViewById(R.id.rotationYZSeek);
+
+                            rotationXY.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                                 @Override
                                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                                     if (fromUser) {
                                         Quaternion rotationz = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), progress);
                                         setLocalRotation(rotationz);
-                                        node.setLocalRotation(Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), -progress));
+                                        controllNode.setLocalRotation(Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), -progress));
+                                    }
+                                }
+
+                                @Override
+                                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                                }
+                            });
+                            /*
+                            rotationXZ.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                @Override
+                                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                    if (fromUser) {
+                                        Quaternion rotationz = Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), progress);
+                                        setLocalRotation(rotationz);
+                                    }
+                                }
+
+                                @Override
+                                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                                }
+                            });
+
+                            rotationYZ.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                @Override
+                                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                    if (fromUser) {
+                                        Quaternion rotationz = Quaternion.axisAngle(new Vector3(0.0f, 0.0f, 1.0f), progress);
+                                        setLocalRotation(rotationz);
+                                    }
+                                }
+
+                                @Override
+                                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                                }
+                            });
+
+*/
+                            SeekBar scale = controllView.findViewById(R.id.scale);
+                            scale.setMax((int) ((getScaleController().getMaxScale() - getScaleController().getMinScale()) * 100));
+                            scale.setProgress(25);
+                            scale.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                @Override
+                                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                    if (fromUser) {
+                                        float scaleF = (float) (getScaleController().getMinScale() + progress / 100.00);
+                                        Vector3 scale = new Vector3(scaleF, scaleF, scaleF);
+                                        Node parent = getParent();
+                                        setParent(null);
+                                        setLocalScale(scale);
+                                        setParent(parent);
                                     }
                                 }
 
@@ -94,8 +169,12 @@ public class FurnitureNode extends TransformableNode {
 
                         });
 
-        addChild(node);
+        addChild(controllNode);
+    }
 
+
+    public void addControllNode() {
+        getParentNode().addChild(controllNode);
     }
 
     public void updateNode() {
@@ -107,15 +186,16 @@ public class FurnitureNode extends TransformableNode {
     }
 
     public void hideControll() {
-        for (Node n : getChildren()) {
-            n.setEnabled(false);
-        }
+        controllNode.setEnabled(false);
     }
 
     public void showControll() {
-        for (Node n : getChildren()) {
-            n.setEnabled(true);
-        }
+        controllNode.setEnabled(true);
     }
 
+    public void remove() {
+        getParentNode().getAnchor().detach();
+        setParent(null);
+        setRenderable(null);
+    }
 }

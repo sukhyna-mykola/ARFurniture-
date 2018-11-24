@@ -37,11 +37,46 @@
         android:layout_height="wrap_content"
         android:text="Bay" />
 
-
-    <SeekBar
-        android:id="@+id/rotationSeek"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="1dp"
+        android:background="@color/colorWhite" />
 
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:padding="5dp"
+        android:rowCount="2">
+
+        <TextView android:text="XY" />
+
+        <SeekBar
+            android:id="@+id/rotationXYSeek"
+            android:layout_width="150dp"
+            android:max="360" />
+        <!--
+               <TextView android:text="XZ" />
+
+              <SeekBar
+                   android:id="@+id/rotationXZSeek"
+                   android:layout_width="match_parent"
+                   android:max="360" />
+
+               <TextView android:text="YZ" />
+
+               <SeekBar
+                   android:id="@+id/rotationYZSeek"
+                   android:layout_width="match_parent"
+                   android:max="360" />-->
+
+        <TextView android:text="Scale" />
+
+        <SeekBar
+            android:id="@+id/scale"
+            android:layout_width="150dp" />
+
+    </GridLayout>
 
 </LinearLayout>

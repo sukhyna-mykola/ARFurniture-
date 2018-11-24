@@ -35,7 +35,6 @@ import java.util.Date;
 
 public class PhotoFragment extends DialogFragment {
     private static final String ARG_BITMAP = "bitmap";
-    private static final String ARG_FILE_NAME = "file_name";
 
     private Bitmap photo;
     private String fileName;
@@ -45,11 +44,10 @@ public class PhotoFragment extends DialogFragment {
         // Required empty public constructor
     }
 
-    public static PhotoFragment newInstance(Bitmap bitmap, String fileName) {
+    public static PhotoFragment newInstance(Bitmap bitmap) {
         PhotoFragment fragment = new PhotoFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_BITMAP, bitmap);
-        args.putString(ARG_FILE_NAME, fileName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,7 +57,7 @@ public class PhotoFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             photo = getArguments().getParcelable(ARG_BITMAP);
-            fileName = getArguments().getString(ARG_FILE_NAME);
+            fileName = generateFilename();
         }
 
         setHasOptionsMenu(true);
@@ -149,9 +147,9 @@ public class PhotoFragment extends DialogFragment {
 
             final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            String shareBody ="Screenshot from ARCore based app";
+            String shareBody = "Screenshot from ARCore based app";
             intent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-            Uri uri  = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".ar.sms.provider", file);
+            Uri uri = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".ar.sms.provider", file);
 
             intent.putExtra(Intent.EXTRA_STREAM, uri);
             intent.setType("image/png");
@@ -161,5 +159,14 @@ public class PhotoFragment extends DialogFragment {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }}
+        }
+    }
+
+
+    private String generateFilename() {
+        String date =
+                new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault()).format(new Date());
+        return Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
+    }
 }
