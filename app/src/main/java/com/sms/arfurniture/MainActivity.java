@@ -1,5 +1,6 @@
 package com.sms.arfurniture;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,9 @@ import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
+import com.google.ar.sceneform.collision.Ray;
+import com.google.ar.sceneform.rendering.Color;
+import com.google.ar.sceneform.rendering.Light;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.rendering.Renderable;
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
     private boolean isTracking;
     private boolean isHitting;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         findViewById(R.id.action_hide_grid).setOnClickListener(this);
         findViewById(R.id.action_hide_pointer).setOnClickListener(this);
         findViewById(R.id.action_take_photo).setOnClickListener(this);
+        findViewById(R.id.action_settings).setOnClickListener(this);
     }
 
 
@@ -122,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
             fragment.getArSceneView()
                     .getPlaneRenderer().setEnabled(true);
         }
-
-
     }
 
     private boolean updateTracking() {
@@ -249,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                 .thenAcceptBoth(trigrid, (material, texture) -> {
                     material.setTexture(PlaneRenderer.MATERIAL_TEXTURE, texture);
                 });
+
     }
 
     @Override
@@ -296,6 +301,12 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
             case R.id.action_take_photo:
                 takePhoto();
                 break;
+
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+
         }
     }
+
 }

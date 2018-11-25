@@ -13,7 +13,7 @@ public class FurnitureItem {
         this.type = type;
         this.title = title;
         this.description = description;
-        this.icon = icon;
+        this.icon = "file:///android_asset/" + icon;
         this.model = model;
     }
 
@@ -52,6 +52,6 @@ public class FurnitureItem {
     }
 
     enum FurnitureType {
-        TABLE, SOFA, CHAIR
+        TABLE, SOFA, CHAIR, SHELF
     }
 }

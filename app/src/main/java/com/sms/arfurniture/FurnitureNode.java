@@ -2,6 +2,7 @@ package com.sms.arfurniture;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
@@ -14,9 +15,11 @@ import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.Sun;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
+import com.google.ar.sceneform.rendering.Light;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.TransformableNode;
 import com.google.ar.sceneform.ux.TransformationSystem;
@@ -28,6 +31,7 @@ public class FurnitureNode extends TransformableNode {
     private RemoweSelectedNodeListener removeSelected;
 
     private TransformableNode controllNode;
+    private Light light;
 
     public AnchorNode getParentNode() {
         return (AnchorNode) getParent();
@@ -36,6 +40,12 @@ public class FurnitureNode extends TransformableNode {
     public FurnitureNode(TransformationSystem transformationSystem, long itemId, Context context, RemoweSelectedNodeListener remoweSelectedNodeListener) {
         super(transformationSystem);
         this.removeSelected = remoweSelectedNodeListener;
+
+        light = Light.builder(Light.Type.DIRECTIONAL)
+                .setColor(new Color(android.graphics.Color.BLUE))
+
+                .setShadowCastingEnabled(true)
+                .build();
 
         FurnitureItem item = FurnitureItemHelper.getInstance().getFurnitireItemById(itemId);
 
@@ -71,6 +81,7 @@ public class FurnitureNode extends TransformableNode {
                                 public void onClick(View v) {
                                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
                                     context.startActivity(browserIntent);
+                                    //addLight();
                                 }
                             });
 
@@ -139,6 +150,7 @@ public class FurnitureNode extends TransformableNode {
                                 }
                             });
 
+
 */
                             SeekBar scale = controllView.findViewById(R.id.scale);
                             scale.setMax((int) ((getScaleController().getMaxScale() - getScaleController().getMinScale()) * 100));
@@ -170,6 +182,14 @@ public class FurnitureNode extends TransformableNode {
                         });
 
         addChild(controllNode);
+    }
+
+    private void addLight() {
+        if (controllNode.getLight() == null) {
+            controllNode.setLight(light);
+        } else {
+            controllNode.setLight(null);
+        }
     }
 
 

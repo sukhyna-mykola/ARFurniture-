@@ -1,0 +1,113 @@
+{
+  materials: [
+    {
+      name: 'Urban_Outfitters_Diamond_Cross_Planes_1_mat1_mtl_1',
+      parameters: [
+        {
+          baseColor: 'dcmap_Urban Outfitters_Diamond Cross Planes Shelf_diff',
+        },
+        {
+          baseColorTint: [
+            0.5,
+            0.5,
+            0.5,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.408248,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+    {
+      name: 'Urban_Outfitters_Diamond_Cross_Planes_1_mat1_mtl_2',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.408248,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+    {
+      name: 'Urban_Outfitters_Diamond_Cross_Planes_1_mat1_mtl_3',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.098000000000000004,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.408248,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/models/Polka/polka.obj',
+    name: 'polka',
+    recenter: 'root',
+    scale: 10.003288999999999998,
+  },
+  samplers: [
+    {
+      file: 'sampledata/models/Polka/dcmap_Urban Outfitters_Diamond Cross Planes Shelf_diff.jpg',
+      name: 'dcmap_Urban Outfitters_Diamond Cross Planes Shelf_diff',
+      params: {
+        usage_type: 'Data',
+      },
+      pipeline_name: 'dcmap_Urban Outfitters_Diamond Cross Planes Shelf_diff.jpg',
+    },
+    {
+      file: 'sampledata/models/Polka/dcmap_Urban Outfitters_Diamond Cross Planes Shelf_bump.jpg',
+      name: 'dcmap_Urban Outfitters_Diamond Cross Planes Shelf_bump',
+      params: {
+        usage_type: 'Data',
+      },
+      pipeline_name: 'dcmap_Urban Outfitters_Diamond Cross Planes Shelf_bump.jpg',
+    },
+  ],
+  version: '0.52:1',
+}

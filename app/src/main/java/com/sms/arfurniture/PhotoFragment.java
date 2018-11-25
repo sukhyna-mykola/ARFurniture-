@@ -115,12 +115,11 @@ public class PhotoFragment extends DialogFragment {
             outputData.writeTo(outputStream);
             outputStream.flush();
             outputStream.close();
-            Snackbar snackbar = Snackbar.make(getDialog().findViewById(android.R.id.content),
-                    "Photo saved", Snackbar.LENGTH_LONG);
+            Snackbar snackbar = Snackbar.make(getDialog().findViewById(android.R.id.content), "Photo saved", Snackbar.LENGTH_LONG);
             snackbar.setAction("Open in Photos", v -> {
                 File photoFile = new File(filename);
 
-                Uri photoURI = FileProvider.getUriForFile(getContext(), getActivity().getPackageName() + ".ar.sms.provider", photoFile);
+                Uri photoURI = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".ar.sms.provider", photoFile);
                 Intent intent = new Intent(Intent.ACTION_VIEW, photoURI);
                 intent.setDataAndType(photoURI, "image/*");
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -129,6 +128,7 @@ public class PhotoFragment extends DialogFragment {
             });
             snackbar.show();
         } catch (IOException ex) {
+            String e = ex.toString();
             Toast.makeText(getContext(), "Failed to save bitmap to disk", Toast.LENGTH_SHORT).show();
         }
 
@@ -167,6 +167,6 @@ public class PhotoFragment extends DialogFragment {
         String date =
                 new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault()).format(new Date());
         return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
+                Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.png";
     }
 }

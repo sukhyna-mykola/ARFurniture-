@@ -30,6 +30,7 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation "com.google.ar.sceneform.ux:sceneform-ux:1.5.1"
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.android.support:support-v4:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -60,3 +61,14 @@ sceneform.asset('sampledata/models/dinner_table.obj',
         'sampledata/models/dinner_table.sfa',
         'src/main/assets/dinner_table')
 
+
+
+sceneform.asset('sampledata/models/ARMCHAIR.obj',
+        'default',
+        'sampledata/models/ARMCHAIR.sfa',
+        'src/main/assets/ARMCHAIR')
+
+sceneform.asset('sampledata/models/Polka/polka.obj',
+        'default',
+        'sampledata/models/Polka/polka.sfa',
+        'src/main/assets/polka')
