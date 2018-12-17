@@ -1,13 +1,18 @@
 package com.sms.arfurniture;
 
+import android.content.Context;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.obsez.android.lib.filechooser.ChooserDialog;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.List;
 
 public class FurnitureListAdapter extends RecyclerView.Adapter<FurnitureListAdapter.ViewHolder> {
@@ -39,7 +44,22 @@ public class FurnitureListAdapter extends RecyclerView.Adapter<FurnitureListAdap
                 .into(holder.icon);
 
         holder.itemView.setOnClickListener(v -> {
-            onItemClickListener.OnItemClick(item);
+            if (item.getId() == 0) {
+                new ChooserDialog().with((Context) onItemClickListener)
+                        .withStartFile(Environment.getExternalStorageState())
+                        .withChosenListener(new ChooserDialog.Result() {
+                            @Override
+                            public void onChoosePath(String path, File pathFile) {
+                                item.setModel(path);
+                                onItemClickListener.OnItemClick(item);
+                            }
+                        })
+                        .build()
+                        .show();
+            } else {
+                onItemClickListener.OnItemClick(item);
+            }
+
         });
     }
 

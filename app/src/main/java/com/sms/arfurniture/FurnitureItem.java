@@ -51,6 +51,10 @@ public class FurnitureItem {
         this.icon = icon;
     }
 
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     enum FurnitureType {
         TABLE, SOFA, CHAIR, SHELF
     }

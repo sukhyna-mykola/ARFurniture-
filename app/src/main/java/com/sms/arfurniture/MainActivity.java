@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.media.CamcorderProfile;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.design.widget.FloatingActionButton;
@@ -202,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
     }
 
     private void placeObject(ArFragment fragment, Anchor anchor, FurnitureItem item, boolean vertical) {
-        if (item.getId()  <0) {
+        if (item.getId() <= 0) {
 
 
             /* When you build a Renderable, Sceneform loads model and related resources
@@ -213,8 +214,8 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                     .setSource(this, RenderableSource.builder().setSource(
                             this,
                             Uri.parse(item.getModel()),
-                            RenderableSource.SourceType.GLTF2)
-                            .setScale(0.5f)  // Scale the original model to 50%.
+                            RenderableSource.SourceType.GLB)
+                            .setScale(0.025f)  // Scale the original model to 25%.
                             .setRecenterMode(RenderableSource.RecenterMode.ROOT)
                             .build())
                     .setRegistryId(item.getModel())
