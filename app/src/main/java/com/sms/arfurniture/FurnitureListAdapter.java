@@ -43,6 +43,12 @@ public class FurnitureListAdapter extends RecyclerView.Adapter<FurnitureListAdap
                 .error(R.drawable.sceneform_hand_phone)
                 .into(holder.icon);
 
+        if (item.getId() < 0) {
+            holder.download.setVisibility(View.VISIBLE);
+        } else {
+            holder.download.setVisibility(View.GONE);
+        }
+
         holder.itemView.setOnClickListener(v -> {
             if (item.getId() == 0) {
                 new ChooserDialog().with((Context) onItemClickListener)
@@ -73,10 +79,12 @@ public class FurnitureListAdapter extends RecyclerView.Adapter<FurnitureListAdap
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView icon;
+        public ImageView download;
 
         ViewHolder(View view) {
             super(view);
             icon = view.findViewById(R.id.furniture_item_icon);
+            download = view.findViewById(R.id.download_item);
         }
     }
 

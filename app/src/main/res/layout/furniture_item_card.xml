@@ -8,4 +8,13 @@
         android:layout_width="100dp"
         android:layout_height="100dp" />
 
+    <ImageView
+        android:id="@+id/download_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="8dp"
+        android:src="@android:drawable/stat_sys_download_done" />
+
 </RelativeLayout>

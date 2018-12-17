@@ -204,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
     private void placeObject(ArFragment fragment, Anchor anchor, FurnitureItem item, boolean vertical) {
         if (item.getId() <= 0) {
-
-
             /* When you build a Renderable, Sceneform loads model and related resources
              * in the background while returning a CompletableFuture.
              * Call thenAccept(), handle(), or check isDone() before calling get().
