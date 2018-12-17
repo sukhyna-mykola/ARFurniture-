@@ -7,6 +7,7 @@ public class FurnitureItem {
     private String description;
     private String icon;
     private String model;
+    private float scale;
 
     public FurnitureItem(long id, FurnitureType type, String title, String description, String icon, String model) {
         this.id = id;
@@ -42,13 +43,19 @@ public class FurnitureItem {
         return icon;
     }
 
-    public FurnitureItem(long id, FurnitureType type, String title, String description, String icon) {
+    public float getScale() {
+        return scale;
+    }
 
+    public FurnitureItem(long id, FurnitureType type, String title, String description, String icon, String model, float scale) {
         this.id = id;
         this.type = type;
         this.title = title;
         this.description = description;
-        this.icon = icon;
+        this.icon = "file:///android_asset/" + icon;
+
+        this.model = model;
+        this.scale = scale;
     }
 
     public void setModel(String model) {

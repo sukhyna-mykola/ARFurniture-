@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                             this,
                             Uri.parse(item.getModel()),
                             RenderableSource.SourceType.GLB)
-                            .setScale(0.025f)  // Scale the original model to 25%.
+                            .setScale(item.getScale())  // Scale the original model to 25%.
                             .setRecenterMode(RenderableSource.RecenterMode.ROOT)
                             .build())
                     .setRegistryId(item.getModel())
