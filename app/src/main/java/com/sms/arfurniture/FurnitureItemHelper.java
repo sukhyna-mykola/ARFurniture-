@@ -21,6 +21,7 @@ public class FurnitureItemHelper {
         furnitureItems.add(new FurnitureItem(3, FurnitureItem.FurnitureType.TABLE, "Table", "Table description", "table_wood.jpg", "table_wood.sfb"));
         furnitureItems.add(new FurnitureItem(4, FurnitureItem.FurnitureType.TABLE, "Dinner Table", "Dinner Table description", "dinner-table-vikor-3d-model-max-obj-3ds-fbx-stl-dae.jpg", "dinner_table.sfb"));
         furnitureItems.add(new FurnitureItem(5, FurnitureItem.FurnitureType.SHELF, "Shelf", "Shelf  description", "polka.jpg", "polka.sfb"));
+        furnitureItems.add(new FurnitureItem(-1, FurnitureItem.FurnitureType.SHELF, "Shelf", "Shelf  description", "plus.png", "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF/Duck.gltf"));
 
     }
 

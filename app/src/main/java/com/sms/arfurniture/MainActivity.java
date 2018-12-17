@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.PixelCopy;
 import android.view.View;
 import android.view.animation.Animation;
@@ -31,6 +32,7 @@ import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
+import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.rendering.Renderable;
@@ -200,19 +202,48 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
     }
 
     private void placeObject(ArFragment fragment, Anchor anchor, FurnitureItem item, boolean vertical) {
-        CompletableFuture<Void> renderableFuture =
-                ModelRenderable.builder()
-                        .setSource(fragment.getContext(), Uri.parse(item.getModel()))
-                        .build()
-                        .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable, item.getId(), vertical))
-                        .exceptionally((throwable -> {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setMessage(throwable.getMessage())
-                                    .setTitle("Codelab error!");
-                            AlertDialog dialog = builder.create();
-                            dialog.show();
-                            return null;
-                        }));
+        if (item.getId()  <0) {
+
+
+            /* When you build a Renderable, Sceneform loads model and related resources
+             * in the background while returning a CompletableFuture.
+             * Call thenAccept(), handle(), or check isDone() before calling get().
+             */
+            ModelRenderable.builder()
+                    .setSource(this, RenderableSource.builder().setSource(
+                            this,
+                            Uri.parse(item.getModel()),
+                            RenderableSource.SourceType.GLTF2)
+                            .setScale(0.5f)  // Scale the original model to 50%.
+                            .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                            .build())
+                    .setRegistryId(item.getModel())
+                    .build()
+                    .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable, item.getId(), vertical))
+                    .exceptionally(
+                            throwable -> {
+                                Toast toast =
+                                        Toast.makeText(this, "Unable to load renderable " +
+                                                item.getModel(), Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                                return null;
+                            });
+        } else {
+            CompletableFuture<Void> renderableFuture =
+                    ModelRenderable.builder()
+                            .setSource(fragment.getContext(), Uri.parse(item.getModel()))
+                            .build()
+                            .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable, item.getId(), vertical))
+                            .exceptionally((throwable -> {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                                builder.setMessage(throwable.getMessage())
+                                        .setTitle("Codelab error!");
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                                return null;
+                            }));
+        }
     }
 
     private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable, long itemId, boolean vertical) {
