@@ -2,18 +2,25 @@ package com.sms.arfurniture;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.CamcorderProfile;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.PixelCopy;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
@@ -24,9 +31,6 @@ import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.collision.Ray;
-import com.google.ar.sceneform.rendering.Color;
-import com.google.ar.sceneform.rendering.Light;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.rendering.Renderable;
@@ -34,32 +38,37 @@ import com.google.ar.sceneform.rendering.Texture;
 import com.google.ar.sceneform.ux.ArFragment;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class MainActivity extends AppCompatActivity implements FurnitureListAdapter.OnItemClickListener, RemoweSelectedNodeListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements FurnitureListAdapter.OnItemClickListener, RemoveSelectedNodeListener, View.OnClickListener {
     private ArFragment fragment;
 
     private RecyclerView furnitureList;
+    private FloatingActionButton actionButtonVideoRecord;
+    private ImageView recordingView;
+    Animation myFadeInAnimation;
 
     private FurnitureItemHelper furnitureItemHelper;
     private NodesHelper nodesHelper;
 
-    private boolean hideControll, hideGrid, hidePointer;
+    private VideoRecorder videoRecorder;
 
-    private PointerDrawable pointer = new PointerDrawable();
+    private boolean hideControll, hideGrid, hidePointer, hideSelection;
+
+    private PointerDrawable pointer;
     private boolean isTracking;
     private boolean isHitting;
 
+    private OnTouchController onTouchController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Create a new video recorder instance.
+        videoRecorder = new VideoRecorder();
+        pointer = new PointerDrawable(this);
 
         furnitureItemHelper = FurnitureItemHelper.getInstance();
         nodesHelper = NodesHelper.getInstance();
@@ -75,14 +84,30 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
         });
 
+        // Specify the AR scene view to be recorded.
+        videoRecorder.setSceneView(fragment.getArSceneView());
+
+        // Set video quality and recording orientation to match that of the device.
+        int orientation = getResources().getConfiguration().orientation;
+        videoRecorder.setVideoQuality(CamcorderProfile.QUALITY_2160P, orientation);
+
 
         setupPlainTexture();
+
+        actionButtonVideoRecord = findViewById(R.id.action_video);
+        recordingView = findViewById(R.id.recording_video);
+        myFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_splash);
+
 
         findViewById(R.id.action_hide_controll).setOnClickListener(this);
         findViewById(R.id.action_hide_grid).setOnClickListener(this);
         findViewById(R.id.action_hide_pointer).setOnClickListener(this);
         findViewById(R.id.action_take_photo).setOnClickListener(this);
         findViewById(R.id.action_settings).setOnClickListener(this);
+        findViewById(R.id.action_video).setOnClickListener(this);
+        findViewById(R.id.action_hide_selection).setOnClickListener(this);
+
+        onTouchController = new OnTouchController();
     }
 
 
@@ -121,13 +146,6 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
             nodesHelper.update();
         }
 
-        if (hideGrid) {
-            fragment.getArSceneView()
-                    .getPlaneRenderer().setEnabled(false);
-        } else {
-            fragment.getArSceneView()
-                    .getPlaneRenderer().setEnabled(true);
-        }
     }
 
     private boolean updateTracking() {
@@ -256,6 +274,28 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
     }
 
+    private void hidePlainTexture() {
+        // Build texture sampler
+        Texture.Sampler sampler = Texture.Sampler.builder()
+                .setMinFilter(Texture.Sampler.MinFilter.LINEAR)
+                .setMagFilter(Texture.Sampler.MagFilter.LINEAR)
+                .setWrapMode(Texture.Sampler.WrapMode.REPEAT).build();
+
+        // Build texture with sampler
+        CompletableFuture<Texture> trigrid = Texture.builder()
+                .setSource(this, R.drawable.plain_empty)
+                .setSampler(sampler).build();
+
+        // Set plane texture
+        fragment.getArSceneView()
+                .getPlaneRenderer()
+                .getMaterial()
+                .thenAcceptBoth(trigrid, (material, texture) -> {
+                    material.setTexture(PlaneRenderer.MATERIAL_TEXTURE, texture);
+                });
+
+    }
+
     @Override
     public void OnItemClick(FurnitureItem item) {
         addObject(item);
@@ -283,9 +323,11 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                 hideGrid = !hideGrid;
 
                 if (hideGrid) {
+                    hidePlainTexture();
                     ((ImageButton) v).setImageResource(R.drawable.ic_border_clear_black_24dp);
                 } else {
                     ((ImageButton) v).setImageResource(R.drawable.grid_24dp);
+                    setupPlainTexture();
                 }
                 break;
 
@@ -304,6 +346,43 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
 
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                break;
+
+            case R.id.action_video:
+                boolean recording = videoRecorder.onToggleRecord();
+                if (recording) {
+                    recordingView.setVisibility(View.VISIBLE);
+                    actionButtonVideoRecord.setImageResource(android.R.drawable.presence_video_online);
+                    recordingView.startAnimation(myFadeInAnimation);
+                } else {
+                    actionButtonVideoRecord.setImageResource(R.drawable.ic_videocam_black_24dp);
+                    recordingView.setVisibility(View.GONE);
+                    recordingView.clearAnimation();
+                    String videoPath = videoRecorder.getVideoPath().getAbsolutePath();
+                    Toast.makeText(this, "File " + videoPath + " saved", Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Video saved", Snackbar.LENGTH_LONG);
+                    snackbar.setAction("Open in Videos", view -> {
+                        File photoFile = new File(videoPath);
+
+                        Uri photoURI = FileProvider.getUriForFile(this, getPackageName() + ".ar.sms.provider", photoFile);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, photoURI);
+                        intent.setDataAndType(photoURI, "video/*");
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(intent);
+
+                    });
+                    snackbar.show();
+                }
+                break;
+
+            case R.id.action_hide_selection:
+                hideSelection = !hideSelection;
+                if (hideSelection) {
+                    ((MyArFragment) fragment).hideSelectionVisualizerRenderable();
+                } else {
+                    ((MyArFragment) fragment).showSelectionVisualizerRenderable();
+                }
+
                 break;
 
         }

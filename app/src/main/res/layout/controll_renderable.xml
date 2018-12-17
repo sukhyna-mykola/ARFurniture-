@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:src="@android:drawable/ic_delete" />
+        android:src="@android:drawable/ic_menu_delete" />
 
     <TextView
         android:id="@+id/title"
@@ -32,10 +32,11 @@
         android:layout_height="100dp" />
 
     <Button
+
         android:id="@+id/bay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bay" />
+        android:text="MORE" />
 
     <View
         android:layout_width="match_parent"
@@ -50,7 +51,9 @@
         android:padding="5dp"
         android:rowCount="2">
 
-        <TextView android:text="XY" />
+        <TextView
+            android:text="XY"
+            android:textColor="@color/colorWhite" />
 
         <SeekBar
             android:id="@+id/rotationXYSeek"
@@ -71,7 +74,9 @@
                    android:layout_width="match_parent"
                    android:max="360" />-->
 
-        <TextView android:text="Scale" />
+        <TextView
+            android:text="Scale"
+            android:textColor="@color/colorWhite" />
 
         <SeekBar
             android:id="@+id/scale"

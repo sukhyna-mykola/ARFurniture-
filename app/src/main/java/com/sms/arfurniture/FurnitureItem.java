@@ -54,4 +54,6 @@ public class FurnitureItem {
     enum FurnitureType {
         TABLE, SOFA, CHAIR, SHELF
     }
+
+
 }

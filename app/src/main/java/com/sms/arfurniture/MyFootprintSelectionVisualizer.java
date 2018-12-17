@@ -15,26 +15,27 @@ import com.google.ar.sceneform.ux.SelectionVisualizer;
 public class MyFootprintSelectionVisualizer implements SelectionVisualizer {
     private final Node footprintNode = new Node();
     @Nullable
-    private ViewRenderable footprintRenderable;
+    private ModelRenderable footprintRenderable;
 
-
-    MyFootprintSelectionVisualizer() {
+    public MyFootprintSelectionVisualizer() {
     }
 
-    public void setFootprintRenderable(ViewRenderable renderable) {
-        ViewRenderable copyRenderable = renderable.makeCopy();
-        this.footprintNode.setRenderable(copyRenderable);
-        Quaternion quaternion = Quaternion.axisAngle(new Vector3(1f, 0, 0), 90);
-        //this.footprintNode.setLocalRotation(quaternion);
-        this.footprintNode.setLocalPosition(new Vector3(0f, 1f, 0f));
-
-        copyRenderable.setCollisionShape(null);
-        this.footprintRenderable = copyRenderable;
-
+    public void setFootprintRenderable(ModelRenderable renderable) {
+        if (renderable != null) {
+            ModelRenderable copyRenderable = renderable.makeCopy();
+            this.footprintNode.setRenderable(copyRenderable);
+            copyRenderable.setCollisionShape((CollisionShape) null);
+            this.footprintRenderable = copyRenderable;
+        } else {
+            this.footprintNode.setRenderable(null);
+            this.footprintRenderable = null;
+        }
     }
+
+
 
     @Nullable
-    public ViewRenderable getFootprintRenderable() {
+    public ModelRenderable getFootprintRenderable() {
         return this.footprintRenderable;
     }
 

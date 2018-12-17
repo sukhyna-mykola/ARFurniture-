@@ -2,20 +2,14 @@ package com.sms.arfurniture;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.net.Uri;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Node;
-import com.google.ar.sceneform.Sun;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
@@ -28,7 +22,7 @@ import com.squareup.picasso.Picasso;
 public class FurnitureNode extends TransformableNode {
     public static final String TAG = FurnitureNode.class.getClass().getSimpleName();
 
-    private RemoweSelectedNodeListener removeSelected;
+    private RemoveSelectedNodeListener removeSelected;
 
     private TransformableNode controllNode;
     private Light light;
@@ -37,9 +31,9 @@ public class FurnitureNode extends TransformableNode {
         return (AnchorNode) getParent();
     }
 
-    public FurnitureNode(TransformationSystem transformationSystem, long itemId, Context context, RemoweSelectedNodeListener remoweSelectedNodeListener) {
+    public FurnitureNode(TransformationSystem transformationSystem, long itemId, Context context, RemoveSelectedNodeListener removeSelectedNodeListener) {
         super(transformationSystem);
-        this.removeSelected = remoweSelectedNodeListener;
+        this.removeSelected = removeSelectedNodeListener;
 
         light = Light.builder(Light.Type.DIRECTIONAL)
                 .setColor(new Color(android.graphics.Color.BLUE))

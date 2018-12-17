@@ -12,37 +12,37 @@ import com.google.ar.sceneform.ux.TransformationSystem;
 
 public class MyArFragment extends ArFragment {
 
+    MyFootprintSelectionVisualizer selectionVisualizer;
 
-  /*  @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
+    @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
     protected TransformationSystem makeTransformationSystem() {
-        MyFootprintSelectionVisualizer selectionVisualizer = new MyFootprintSelectionVisualizer();
-
+        selectionVisualizer = new MyFootprintSelectionVisualizer();
         TransformationSystem transformationSystem =
                 new TransformationSystem(getResources().getDisplayMetrics(), selectionVisualizer);
 
-        ViewRenderable.builder()
-                .setView(getActivity(), R.layout.footprint_renderable)
-                .build()
-                .thenAccept(
-                        renderable -> {
-                            // If the selection visualizer already has a footprint renderable, then it was set to
-                            // something custom. Don't override the custom visual.
-                            if (selectionVisualizer.getFootprintRenderable() == null) {
-                                selectionVisualizer.setFootprintRenderable(renderable);
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-                            Toast toast =
-                                    Toast.makeText(
-                                            getContext(), "Unable to load footprint renderable", Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                            return null;
-                        });
+        showSelectionVisualizerRenderable();
 
         return transformationSystem;
-    }*/
+    }
+
+
+    public void hideSelectionVisualizerRenderable() {
+        selectionVisualizer.setFootprintRenderable(null);
+    }
+
+    public void showSelectionVisualizerRenderable() {
+        (ModelRenderable.builder().setSource(this.getActivity(), com.google.ar.sceneform.ux.R.raw.sceneform_footprint)).build().thenAccept((renderable) -> {
+            if (selectionVisualizer.getFootprintRenderable() == null) {
+                selectionVisualizer.setFootprintRenderable(renderable);
+            }
+
+        }).exceptionally((throwable) -> {
+            Toast toast = Toast.makeText(this.getContext(), "Unable to load footprint renderable", 1);
+            toast.setGravity(17, 0, 0);
+            toast.show();
+            return null;
+        });
+    }
 
     @Override
     public String[] getAdditionalPermissions() {

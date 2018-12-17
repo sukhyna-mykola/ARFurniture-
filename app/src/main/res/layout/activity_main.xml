@@ -8,13 +8,27 @@
 
     <include layout="@layout/content_main" />
 
+
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/action_take_photo"
+        android:id="@+id/action_video"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="@dimen/fab_margin"
         app:layout_anchor="@+id/furniture_list_view"
         app:layout_anchorGravity="top|end"
+        app:srcCompat="@drawable/ic_videocam_black_24dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/action_take_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="8dp"
+        android:translationY="-20dp"
+        app:fabSize="mini"
+        app:layout_anchor="@+id/action_video"
+        app:layout_anchorGravity="top|end"
         app:srcCompat="@android:drawable/ic_menu_camera" />
+
 
 </android.support.design.widget.CoordinatorLayout>
