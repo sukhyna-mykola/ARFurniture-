@@ -26,13 +26,15 @@ public class FurnitureNode extends TransformableNode {
 
     private TransformableNode controllNode;
     private Light light;
+    private boolean isVertical;
 
     public AnchorNode getParentNode() {
         return (AnchorNode) getParent();
     }
 
-    public FurnitureNode(TransformationSystem transformationSystem, long itemId, Context context, RemoveSelectedNodeListener removeSelectedNodeListener) {
+    public FurnitureNode(TransformationSystem transformationSystem, long itemId, Context context, RemoveSelectedNodeListener removeSelectedNodeListener, boolean vertical) {
         super(transformationSystem);
+        this.isVertical = vertical;
         this.removeSelected = removeSelectedNodeListener;
 
         light = Light.builder(Light.Type.DIRECTIONAL)
@@ -44,7 +46,17 @@ public class FurnitureNode extends TransformableNode {
         FurnitureItem item = FurnitureItemHelper.getInstance().getFurnitireItemById(itemId);
 
         controllNode = new TransformableNode(transformationSystem);
-        controllNode.setLocalPosition(new Vector3(0f, 1f, 0f));
+
+
+        if (vertical) {
+            Quaternion rotationz = Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90);
+            controllNode.setLocalRotation(rotationz);
+            Quaternion rotationxy = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), -95);
+            setLocalRotation(rotationxy);
+            controllNode.setLocalPosition(new Vector3(0f, 0f, 0.7f));
+        } else {
+            controllNode.setLocalPosition(new Vector3(0f, 1f, 0f));
+        }
 
         ViewRenderable.builder()
                 .setView(context, R.layout.controll_renderable)
@@ -87,9 +99,19 @@ public class FurnitureNode extends TransformableNode {
                                 @Override
                                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                                     if (fromUser) {
-                                        Quaternion rotationz = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), progress);
-                                        setLocalRotation(rotationz);
-                                        controllNode.setLocalRotation(Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), -progress));
+
+                                        if (isVertical) {
+                                            Quaternion rotationy = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), progress - 95);
+                                            setLocalRotation(rotationy);
+
+                                            Quaternion quaternionzy = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), -progress - 95);
+                                            Quaternion rotationzx = Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90);
+                                            controllNode.setLocalRotation(Quaternion.multiply(quaternionzy, rotationzx));
+                                        } else {
+                                            Quaternion rotationz = Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), progress);
+                                            setLocalRotation(rotationz);
+                                            controllNode.setLocalRotation(Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), -progress));
+                                        }
                                     }
                                 }
 

@@ -68,6 +68,9 @@ sceneform.asset('sampledata/models/ARMCHAIR.obj',
         'sampledata/models/ARMCHAIR.sfa',
         'src/main/assets/ARMCHAIR')
 
+
+
+
 sceneform.asset('sampledata/models/Polka/polka.obj',
         'default',
         'sampledata/models/Polka/polka.sfa',

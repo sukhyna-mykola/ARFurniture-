@@ -89,7 +89,7 @@
     file: 'sampledata/models/Polka/polka.obj',
     name: 'polka',
     recenter: 'root',
-    scale: 10.003288999999999998,
+    scale: 0.0125,
   },
   samplers: [
     {

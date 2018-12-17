@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                 Trackable trackable = hit.getTrackable();
                 if (trackable instanceof Plane &&
                         ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    placeObject(fragment, hit.createAnchor(), item);
+                    placeObject(fragment, hit.createAnchor(), item, ((Plane) trackable).getType() == Plane.Type.VERTICAL);
                     break;
 
                 }
@@ -199,12 +199,12 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
         }
     }
 
-    private void placeObject(ArFragment fragment, Anchor anchor, FurnitureItem item) {
+    private void placeObject(ArFragment fragment, Anchor anchor, FurnitureItem item, boolean vertical) {
         CompletableFuture<Void> renderableFuture =
                 ModelRenderable.builder()
                         .setSource(fragment.getContext(), Uri.parse(item.getModel()))
                         .build()
-                        .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable, item.getId()))
+                        .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable, item.getId(), vertical))
                         .exceptionally((throwable -> {
                             AlertDialog.Builder builder = new AlertDialog.Builder(this);
                             builder.setMessage(throwable.getMessage())
@@ -215,9 +215,9 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
                         }));
     }
 
-    private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable, long itemId) {
+    private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable, long itemId, boolean vertical) {
         AnchorNode anchorNode = new AnchorNode(anchor);
-        FurnitureNode node = new FurnitureNode(fragment.getTransformationSystem(), itemId, this, this);
+        FurnitureNode node = new FurnitureNode(fragment.getTransformationSystem(), itemId, this, this, vertical);
         node.setRenderable(renderable);
         node.setParent(anchorNode);
         //node.addControllNode();
@@ -378,9 +378,12 @@ public class MainActivity extends AppCompatActivity implements FurnitureListAdap
             case R.id.action_hide_selection:
                 hideSelection = !hideSelection;
                 if (hideSelection) {
+                    ((ImageButton) v).setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp);
                     ((MyArFragment) fragment).hideSelectionVisualizerRenderable();
                 } else {
                     ((MyArFragment) fragment).showSelectionVisualizerRenderable();
+                    ((ImageButton) v).setImageResource(R.drawable.ic_golf_course_black_24dp);
+
                 }
 
                 break;
