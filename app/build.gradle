@@ -79,3 +79,8 @@ sceneform.asset('sampledata/models/Polka/polka.obj',
         'default',
         'sampledata/models/Polka/polka.sfa',
         'src/main/assets/polka')
+
+sceneform.asset('sampledata/models/dick_hp.obj',
+        'default',
+        'sampledata/models/dick_hp.sfa',
+        'src/main/assets/dick_hp')

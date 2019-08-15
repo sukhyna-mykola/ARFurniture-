@@ -14,10 +14,16 @@ import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.Light;
+import com.google.ar.sceneform.rendering.Material;
+import com.google.ar.sceneform.rendering.MaterialFactory;
+import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.TransformableNode;
 import com.google.ar.sceneform.ux.TransformationSystem;
 import com.squareup.picasso.Picasso;
+
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 public class FurnitureNode extends TransformableNode {
     public static final String TAG = FurnitureNode.class.getClass().getSimpleName();
@@ -39,9 +45,9 @@ public class FurnitureNode extends TransformableNode {
 
         light = Light.builder(Light.Type.DIRECTIONAL)
                 .setColor(new Color(android.graphics.Color.BLUE))
-
                 .setShadowCastingEnabled(true)
                 .build();
+
 
         FurnitureItem item = FurnitureItemHelper.getInstance().getFurnitireItemById(itemId);
 
@@ -85,9 +91,12 @@ public class FurnitureNode extends TransformableNode {
                             controllView.findViewById(R.id.bay).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+                                  /*  Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
                                     context.startActivity(browserIntent);
-                                    //addLight();
+                                    //addLight();*/
+
+                                    addHighlightToNode(context, FurnitureNode.this);
+
                                 }
                             });
 
@@ -233,5 +242,16 @@ public class FurnitureNode extends TransformableNode {
         getParentNode().getAnchor().detach();
         setParent(null);
         setRenderable(null);
+    }
+
+    private void addHighlightToNode(Context context, Node node) {
+        CompletableFuture<Material> materialCompletableFuture =
+                MaterialFactory.makeOpaqueWithColor(context,   new Color(new Random().nextFloat(), new Random().nextFloat(), new Random().nextFloat()));
+
+        materialCompletableFuture.thenAccept(material -> {
+            Renderable r2 = node.getRenderable().makeCopy();
+            r2.setMaterial(material);
+            node.setRenderable(r2);
+        });
     }
 }

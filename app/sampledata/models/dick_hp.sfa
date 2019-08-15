@@ -1,0 +1,42 @@
+{
+  materials: [
+    {
+      name: 'ThickensHP',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            1,
+            0.502,
+            0,
+            1,
+          ],
+        },
+        {
+          metallic: 0,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/models/dick_hp.obj',
+    name: 'dick_hp',
+    recenter: 'root',
+    scale: 0.004323000000000001,
+  },
+  version: '0.52:1',
+}

@@ -21,6 +21,7 @@ public class FurnitureItemHelper {
         furnitureItems.add(new FurnitureItem(3, FurnitureItem.FurnitureType.TABLE, "Table", "Table description", "table_wood.jpg", "table_wood.sfb"));
         furnitureItems.add(new FurnitureItem(4, FurnitureItem.FurnitureType.TABLE, "Dinner Table", "Dinner Table description", "dinner-table-vikor-3d-model-max-obj-3ds-fbx-stl-dae.jpg", "dinner_table.sfb"));
         furnitureItems.add(new FurnitureItem(5, FurnitureItem.FurnitureType.SHELF, "Shelf", "Shelf  description", "polka.jpg", "polka.sfb"));
+        furnitureItems.add(new FurnitureItem(6, FurnitureItem.FurnitureType.SHELF, "Penis", "Penis  description", "penis.jpg", "dick_hp.sfb"));
 
         furnitureItems.add(new FurnitureItem(-1, FurnitureItem.FurnitureType.CHAIR, "Chair Remoute", "Chair Remoute description", "chair_model.jpg", "https://github.com/sukhyna-mykola/ARFurniture-/blob/master/models/Table/chair_model.glb?raw=true", 0.02f));
 
